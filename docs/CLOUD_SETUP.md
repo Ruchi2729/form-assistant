@@ -1,6 +1,12 @@
 # First Google Cloud deployment
 
-## Current state
+## Deployment configuration
+
+Project: `form-assistant-better-life` (313979383533). Region: `us-central1`. Repository: `Ruchi2729/form-assistant`. Nonsecret deployment identifiers are checked into the workflow. Deployment runs after CI passes on main; pull requests run checks only.
+
+Run `scripts/bootstrap-cloud.sh` as a project administrator for initial registry, service identities and Workload Identity Federation setup. Public Cloud Run invocation is configured separately by the administrator after initial deployment.
+
+## Original setup checklist (reference)
 
 The frontend build and local lint pass. GitHub Actions runs lint, a production build, a Docker build, and HTTP smoke checks against the container. Cloud deployment requires the setup below. Google sign-in, uploads and LLM calls are not connected; publishing the frontend does not enable those features.
 
@@ -37,7 +43,7 @@ Create a production environment and configure these environment variables:
 | GCP_DEPLOY_SERVICE_ACCOUNT | Deployment service-account email |
 | GCP_RUNTIME_SERVICE_ACCOUNT | Runtime service-account email |
 
-Set FORM_ASSISTANT_DEPLOY_ENABLED=true as a **repository** variable (the job gate is evaluated before environment variables are available). Keep it unset until setup is complete.
+The current workflow uses checked-in nonsecret values instead of these variables; no enable variable is required. This table documents the equivalent configurable values.
 
 ## 4. Deploy and verify
 
