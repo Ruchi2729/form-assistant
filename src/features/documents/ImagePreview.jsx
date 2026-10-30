@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function ImagePreview({ file }) {
+export default function ImagePreview({ file, onReady }) {
   const imageRef = useRef(null)
   const [error, setError] = useState(false)
   useEffect(() => {
@@ -17,6 +17,7 @@ export default function ImagePreview({ file }) {
         <img
           ref={imageRef}
           alt={`Your selected form: ${file.name}`}
+          onLoad={onReady}
           onError={() => setError(true)}
           className="max-h-[600px] w-full rounded border border-[#dbe1d3] object-contain"
         />

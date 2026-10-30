@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Button from '../../components/ui/Button.jsx'
 
-export default function PdfPreview({ file }) {
+export default function PdfPreview({ file, onReady }) {
   const canvasRef = useRef(null)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -83,6 +83,7 @@ export default function PdfPreview({ file }) {
               .slice(0, 20000),
           )
           setLoading(false)
+          onReady()
         }
       } catch (failure) {
         if (!cancelled && failure.name !== 'RenderingCancelledException') {
@@ -98,7 +99,7 @@ export default function PdfPreview({ file }) {
       cancelled = true
       renderTask?.cancel()
     }
-  }, [page, total])
+  }, [page, total, onReady])
 
   return (
     <div className="mt-4 space-y-3">

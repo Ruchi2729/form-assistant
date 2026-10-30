@@ -1,20 +1,28 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import useAppState from '../../state/useAppState.js'
 import Button from '../../components/ui/Button.jsx'
 import Disclosure from '../../components/ui/Disclosure.jsx'
 import LoginCard from '../auth/LoginCard.jsx'
 import DocumentPreview from './DocumentPreview.jsx'
 import { validateFile } from './validateFile'
 
-export default function UploadCard({ user, loading, sessionError }) {
-  const [document, setDocument] = useState(null)
+export default function UploadCard() {
+  const { document, selectDocument, clearDocument } = useAppState()
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
   const fileInput = useRef(null)
   const requestId = useRef(0)
 
-  function clearDocument() {
+  useEffect(
+    () => () => {
+      requestId.current += 1
+    },
+    [],
+  )
+
+  function handleRemove() {
     requestId.current += 1
-    setDocument(null)
+    clearDocument()
     setError('')
     setChecking(false)
     if (fileInput.current) fileInput.current.value = ''
@@ -30,7 +38,7 @@ export default function UploadCard({ user, loading, sessionError }) {
     try {
       const result = await validateFile(file)
       if (current === requestId.current)
-        setDocument({ file, ...result, selectionId: current })
+        selectDocument({ file, ...result, selectionId: crypto.randomUUID() })
     } catch (failure) {
       if (current === requestId.current) setError(failure.message)
     } finally {
@@ -96,17 +104,12 @@ export default function UploadCard({ user, loading, sessionError }) {
             device
           </p>
           <DocumentPreview key={document.selectionId} document={document} />
-          <Button className="mt-4" onClick={clearDocument}>
+          <Button className="mt-4" onClick={handleRemove}>
             Remove document
           </Button>
         </div>
       )}
-      <LoginCard
-        user={user}
-        loading={loading}
-        sessionError={sessionError}
-        onSignedOut={clearDocument}
-      />
+      <LoginCard />
       <Disclosure
         title="Your document and your choices"
         className="mt-4 border-b-0 border-t border-[#dbe1d3] pt-2"

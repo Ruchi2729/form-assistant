@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import useAppState from '../../state/useAppState.js'
 import Button from '../../components/ui/Button.jsx'
 import GoogleMark from '../../components/illustrations/GoogleMark.jsx'
 import { signInWithGoogle, signOutAccount } from './firebase'
@@ -26,12 +27,13 @@ function signInMessage(error) {
   )
 }
 
-export default function LoginCard({
-  user,
-  loading,
-  sessionError,
-  onSignedOut,
-}) {
+export default function LoginCard() {
+  const {
+    user,
+    authLoading: loading,
+    authError: sessionError,
+    clearDocument,
+  } = useAppState()
   const [pending, setPending] = useState(false)
   const [notice, setNotice] = useState('')
 
@@ -54,7 +56,7 @@ export default function LoginCard({
     setPending(true)
     try {
       await signOutAccount()
-      onSignedOut()
+      clearDocument()
       setNotice(
         'Signed out. Your selected document has been removed from this page.',
       )

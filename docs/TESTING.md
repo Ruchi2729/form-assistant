@@ -29,7 +29,9 @@ Pull requests run formatting, unit/component tests, lint, build, Playwright desk
 ## Module boundaries
 
 - `features/auth/firebase.js`: SDK configuration and identity-provider operations.
-- `features/auth/useAuth.js`: auth-state subscription and cleanup.
+- `state/AppStateProvider.jsx`: one auth subscription, shared state and stable actions.
+- `state/appReducer.js`: user/document transitions and workspace eligibility.
+- `state/useAppState.js`: context consumption without prop drilling.
 - `features/auth/LoginCard.jsx`: account UI, loading and error states.
 - `features/documents/validateFile.js`: file acceptance rules; independent of React.
 - `features/documents/UploadCard.jsx`: selected-document lifecycle and account composition.
@@ -38,3 +40,11 @@ Pull requests run formatting, unit/component tests, lint, build, Playwright desk
 - `features/documents/ImagePreview.jsx`: local image URL lifecycle.
 
 Files are held in page memory, not uploaded. Sign-in uses a popup to preserve selection. Refreshing clears the selection; successful sign-out clears it as well. Client checks are UX safeguards and must be repeated independently if server uploads are added.
+
+## Shared application state
+
+`AppStateProvider` is mounted once above App. It uses a reducer for the authenticated user, selected document and authentication readiness. `useAppState()` reads that shared value directly in features. Components keep pending button actions, file-check errors and page navigation local.
+
+Workspace entry is derived from a resolved signed-in user and a document whose first preview has succeeded. It works in either order. Cancelled sign-in leaves an anonymous document intact; sign-out, authentication failure or an account change clears it. Preview callbacks carry a unique selection ID so stale work cannot mark a replacement document ready. Files remain in memory and are not persisted or shared with AI.
+
+The entry screen confirms readiness only. No agent conversation or document analysis has been implemented.
