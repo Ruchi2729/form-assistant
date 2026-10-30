@@ -16,9 +16,9 @@ React tests mock only the authentication service and preview component. They exe
 
 ## Live Google sign-in setup
 
-Firebase initialization was denied by the API for the current account. In https://console.firebase.google.com/ add Firebase to the existing form-assistant-better-life project, initialize Authentication and enable Google with a support email. Register a Web app and obtain the public Firebase configuration.
+The Firebase project and Web app are registered and the public browser configuration is included. Google-provider initialization still requires Firebase Console setup. In https://console.firebase.google.com/ add Firebase to the existing form-assistant-better-life project, initialize Authentication and enable Google with a support email. Register a Web app and obtain the public Firebase configuration.
 
-Populate `src/features/auth/firebase-config.json` with apiKey, authDomain, projectId and appId, or use the corresponding VITE_FIREBASE_* variables locally. Never include OAuth client secrets, service-account keys or access tokens. Vite variables are compiled into browser code, so only public Firebase configuration belongs there.
+The app reads `src/features/auth/firebase-config.json` with apiKey, authDomain, projectId and appId; alternatively use the corresponding VITE_FIREBASE_* variables locally. Never include OAuth client secrets, service-account keys or access tokens. Vite variables are compiled into browser code, so only public Firebase configuration belongs there.
 
 Authorized domains must include localhost, 127.0.0.1 and form-assistant-35hyxw4m3a-uc.a.run.app. Confirm a successful real sign-in, popup cancellation, session restoration, sign-out and document preservation manually before calling live authentication verified. User credentials are entered only on Google's page.
 
@@ -54,3 +54,5 @@ The entry screen confirms readiness only. No agent conversation or document anal
 Source components, state, services, test fixtures and build/test configuration are TypeScript. Strict type checking includes both source and tests. `npm run typecheck` checks without emitting; `npm run build` also typechecks so Docker cannot package a build with type errors.
 
 After both sign-in and a successful local document preview, the app opens a chatbot-style workspace labeled Under construction. The composer is disabled; no messages or documents are sent to a model. Component tests exercise this transition and sign-out recovery. Live OAuth still requires the project's Firebase configuration and a real user completing Google's sign-in page.
+
+Run `PLAYWRIGHT_BASE_URL=https://form-assistant-35hyxw4m3a-uc.a.run.app npm run test:e2e` for synthetic, local-only preview tests against production. This does not sign in with a real account or upload any files to a server.

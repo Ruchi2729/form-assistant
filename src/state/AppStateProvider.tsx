@@ -16,7 +16,17 @@ export default function AppStateProvider({ children }: ProviderProps) {
     if (!auth) return undefined
     return onAuthStateChanged(
       auth,
-      (user) => dispatch({ type: 'auth/resolved', user }),
+      (user) =>
+        dispatch({
+          type: 'auth/resolved',
+          user: user
+            ? {
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+              }
+            : null,
+        }),
       () =>
         dispatch({
           type: 'auth/failed',
