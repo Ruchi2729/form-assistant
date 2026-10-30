@@ -1,12 +1,13 @@
+import type { PreviewProps } from '../../state/types'
 import { useEffect, useRef, useState } from 'react'
 
-export default function ImagePreview({ file, onReady }) {
-  const imageRef = useRef(null)
+export default function ImagePreview({ file, onReady }: PreviewProps) {
+  const imageRef = useRef<HTMLImageElement | null>(null)
   const [error, setError] = useState(false)
   useEffect(() => {
     const objectUrl = URL.createObjectURL(file)
     // Object URLs are local browser references, not uploads.
-    imageRef.current.src = objectUrl
+    if (imageRef.current) imageRef.current.src = objectUrl
     return () => URL.revokeObjectURL(objectUrl)
   }, [file])
   return (

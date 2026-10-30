@@ -1,4 +1,4 @@
-import Disclosure from '../../components/ui/Disclosure.jsx'
+import Disclosure from '../../components/ui/Disclosure'
 
 export default function PurposeSection() {
   return (

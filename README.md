@@ -9,7 +9,7 @@ From this directory: `npm ci`, then `npm run dev`. In this workspace, existing p
 ## Layout and React concepts
 
 - `index.html` is the HTML shell; `#root` is where React mounts.
-- `src/App.jsx` supplies semantic `header`, `main`, `section`, and `footer` landmarks.
+- `src/App.tsx` supplies semantic `header`, `main`, `section`, and `footer` landmarks.
 - `App`, `DocumentIllustration`, and `GoogleMark` are components: reusable functions returning JSX.
 - `useState` holds the sign-in notice. Clicking the button updates state and React updates the status region.
 - CSS Grid arranges two columns; the media query below 700px switches to one column. Flexbox aligns smaller rows.
@@ -50,6 +50,6 @@ See [Agent architecture and learning milestones](docs/AGENT_ARCHITECTURE.md). Th
 
 Tailwind CSS is enabled through `@tailwindcss/vite` and the CSS import in `src/styles.css`. Layout and shared controls use utilities; custom illustration and typography rules remain in the components CSS layer so utilities take precedence.
 
-`src/App.jsx` composes page sections. `src/components/ui` is our internal shared library: Button accepts children and native button props, Disclosure wraps native details/summary, and BenefitList maps data to a semantic list. Feature-specific content lives under `src/features`. No paid component library is required.
+`src/App.tsx` composes page sections. `src/components/ui` is our internal shared library: Button accepts children and native button props, Disclosure wraps native details/summary, and BenefitList maps data to a semantic list. Feature-specific content lives under `src/features`. No paid component library is required.
 
 For example, `<Button onClick={handleContinue}>Continue</Button>` reuses appearance and behavior while `children` supplies its label. Keep complete Tailwind class names in source so the build can discover them. New controls should preserve native HTML semantics and keyboard access.

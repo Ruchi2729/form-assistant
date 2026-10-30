@@ -1,14 +1,21 @@
+import type { AppState, AppAction, DocumentInput } from '../src/state/types'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   appReducer,
   createInitialState,
   canEnterWorkspace,
-} from '../src/state/appReducer.js'
+} from '../src/state/appReducer'
 
 const user = { uid: 'member-1' }
-const document = { selectionId: 'doc-1', file: { name: 'sample.pdf' } }
-const reduce = (state, ...actions) => actions.reduce(appReducer, state)
+const document: DocumentInput = {
+  selectionId: 'doc-1',
+  file: new File(['%PDF-1.7'], 'sample.pdf'),
+  kind: 'pdf',
+  mime: 'application/pdf',
+}
+const reduce = (state: AppState, ...actions: AppAction[]) =>
+  actions.reduce(appReducer, state)
 
 test('document-first selection survives the first login', () => {
   const state = reduce(
@@ -17,7 +24,7 @@ test('document-first selection survives the first login', () => {
     { type: 'document/ready', selectionId: 'doc-1' },
     { type: 'auth/resolved', user },
   )
-  assert.equal(state.document.file.name, 'sample.pdf')
+  assert.equal(state.document?.file.name, 'sample.pdf')
   assert.equal(canEnterWorkspace(state), true)
 })
 test('login-first waits until the selected document is ready', () => {

@@ -28,16 +28,16 @@ Pull requests run formatting, unit/component tests, lint, build, Playwright desk
 
 ## Module boundaries
 
-- `features/auth/firebase.js`: SDK configuration and identity-provider operations.
-- `state/AppStateProvider.jsx`: one auth subscription, shared state and stable actions.
-- `state/appReducer.js`: user/document transitions and workspace eligibility.
-- `state/useAppState.js`: context consumption without prop drilling.
-- `features/auth/LoginCard.jsx`: account UI, loading and error states.
-- `features/documents/validateFile.js`: file acceptance rules; independent of React.
-- `features/documents/UploadCard.jsx`: selected-document lifecycle and account composition.
-- `features/documents/DocumentPreview.jsx`: chooses the appropriate preview.
-- `features/documents/PdfPreview.jsx`: lazy PDF.js loading, rendering and page text.
-- `features/documents/ImagePreview.jsx`: local image URL lifecycle.
+- `features/auth/firebase.ts`: SDK configuration and identity-provider operations.
+- `state/AppStateProvider.tsx`: one auth subscription, shared state and stable actions.
+- `state/appReducer.ts`: user/document transitions and workspace eligibility.
+- `state/useAppState.ts`: context consumption without prop drilling.
+- `features/auth/LoginCard.tsx`: account UI, loading and error states.
+- `features/documents/validateFile.ts`: file acceptance rules; independent of React.
+- `features/documents/UploadCard.tsx`: selected-document lifecycle and account composition.
+- `features/documents/DocumentPreview.tsx`: chooses the appropriate preview.
+- `features/documents/PdfPreview.tsx`: lazy PDF.js loading, rendering and page text.
+- `features/documents/ImagePreview.tsx`: local image URL lifecycle.
 
 Files are held in page memory, not uploaded. Sign-in uses a popup to preserve selection. Refreshing clears the selection; successful sign-out clears it as well. Client checks are UX safeguards and must be repeated independently if server uploads are added.
 
@@ -48,3 +48,9 @@ Files are held in page memory, not uploaded. Sign-in uses a popup to preserve se
 Workspace entry is derived from a resolved signed-in user and a document whose first preview has succeeded. It works in either order. Cancelled sign-in leaves an anonymous document intact; sign-out, authentication failure or an account change clears it. Preview callbacks carry a unique selection ID so stale work cannot mark a replacement document ready. Files remain in memory and are not persisted or shared with AI.
 
 The entry screen confirms readiness only. No agent conversation or document analysis has been implemented.
+
+## TypeScript and agent placeholder
+
+Source components, state, services, test fixtures and build/test configuration are TypeScript. Strict type checking includes both source and tests. `npm run typecheck` checks without emitting; `npm run build` also typechecks so Docker cannot package a build with type errors.
+
+After both sign-in and a successful local document preview, the app opens a chatbot-style workspace labeled Under construction. The composer is disabled; no messages or documents are sent to a model. Component tests exercise this transition and sign-out recovery. Live OAuth still requires the project's Firebase configuration and a real user completing Google's sign-in page.

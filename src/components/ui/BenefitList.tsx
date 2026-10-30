@@ -1,4 +1,8 @@
-export default function BenefitList({ items }) {
+export default function BenefitList({
+  items,
+}: {
+  items: { title: string; description: string }[]
+}) {
   return (
     <ul className="mt-6 grid list-none gap-4 border-t border-[#e9eae2] p-0 pt-6">
       {items.map(({ title, description }) => (

@@ -1,4 +1,8 @@
-export default function Disclosure({ title, children, className = '' }) {
+import type { ReactNode } from 'react'
+
+type Props = { title: string; children: ReactNode; className?: string }
+
+export default function Disclosure({ title, children, className = '' }: Props) {
   return (
     <details className={`border-b border-[#dbe1d3] pb-4 ${className}`}>
       <summary className="min-h-11 cursor-pointer py-2.5 text-sm font-semibold">

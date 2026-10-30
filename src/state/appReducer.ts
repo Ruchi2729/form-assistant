@@ -1,4 +1,6 @@
-export function createInitialState(authConfigured) {
+import type { AppState, AppAction } from './types'
+
+export function createInitialState(authConfigured: boolean): AppState {
   return {
     user: null,
     document: null,
@@ -7,7 +9,7 @@ export function createInitialState(authConfigured) {
   }
 }
 
-export function appReducer(state, action) {
+export function appReducer(state: AppState, action: AppAction): AppState {
   switch (action.type) {
     case 'auth/resolved': {
       const accountChanged = state.user && state.user.uid !== action.user?.uid
@@ -43,7 +45,7 @@ export function appReducer(state, action) {
   }
 }
 
-export function canEnterWorkspace(state) {
+export function canEnterWorkspace(state: AppState): boolean {
   return (
     !state.authLoading &&
     Boolean(state.user && state.document?.status === 'ready')

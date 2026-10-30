@@ -1,18 +1,24 @@
+import type {
+  PDFDocumentProxy,
+  PDFDocumentLoadingTask,
+  RenderTask,
+} from 'pdfjs-dist'
+import type { PreviewProps } from '../../state/types'
 import { useEffect, useRef, useState } from 'react'
-import Button from '../../components/ui/Button.jsx'
+import Button from '../../components/ui/Button'
 
-export default function PdfPreview({ file, onReady }) {
-  const canvasRef = useRef(null)
+export default function PdfPreview({ file, onReady }: PreviewProps) {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [text, setText] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
-  const documentRef = useRef(null)
+  const documentRef = useRef<PDFDocumentProxy | null>(null)
 
   useEffect(() => {
     let cancelled = false
-    let task
+    let task: PDFDocumentLoadingTask | undefined
     async function load() {
       try {
         const pdfjs = await import('pdfjs-dist')
@@ -22,7 +28,7 @@ export default function PdfPreview({ file, onReady }) {
         if (cancelled) return
         const bytes = new Uint8Array(await file.arrayBuffer())
         if (cancelled) return
-        task = pdfjs.getDocument({ data: bytes, isEvalSupported: false })
+        task = pdfjs.getDocument({ data: bytes })
         const pdf = await task.promise
         if (cancelled) return
         if (pdf.numPages > 100) throw new Error('too-many-pages')
@@ -32,9 +38,9 @@ export default function PdfPreview({ file, onReady }) {
         if (!cancelled) {
           setLoading(false)
           setError(
-            failure.name === 'PasswordException'
+            failure instanceof Error && failure.name === 'PasswordException'
               ? 'This PDF is password-protected. Choose an unlocked copy you have permission to use.'
-              : failure.message === 'too-many-pages'
+              : failure instanceof Error && failure.message === 'too-many-pages'
                 ? 'Choose a PDF with 100 pages or fewer.'
                 : 'We couldn’t read this PDF. Try exporting a new copy or choose a photo of the form.',
           )
@@ -52,12 +58,14 @@ export default function PdfPreview({ file, onReady }) {
   useEffect(() => {
     if (!total || !documentRef.current) return undefined
     let cancelled = false
-    let renderTask
+    let renderTask: RenderTask | undefined
     async function render() {
       setLoading(true)
       setText('')
       try {
-        const pdfPage = await documentRef.current.getPage(page)
+        const pdf = documentRef.current
+        if (!pdf) return
+        const pdfPage = await pdf.getPage(page)
         if (cancelled) return
         const original = pdfPage.getViewport({ scale: 1 })
         const scale = Math.min(
@@ -67,10 +75,14 @@ export default function PdfPreview({ file, onReady }) {
         )
         const viewport = pdfPage.getViewport({ scale })
         const canvas = canvasRef.current
+        if (!canvas) return
+        const context = canvas.getContext('2d')
+        if (!context) throw new Error('Canvas unavailable')
         canvas.width = Math.ceil(viewport.width)
         canvas.height = Math.ceil(viewport.height)
         renderTask = pdfPage.render({
-          canvasContext: canvas.getContext('2d'),
+          canvas,
+          canvasContext: context,
           viewport,
         })
         await renderTask.promise
@@ -78,7 +90,9 @@ export default function PdfPreview({ file, onReady }) {
         if (!cancelled) {
           setText(
             content.items
-              .map((item) => item.str + (item.hasEOL ? '\n' : ' '))
+              .map((item) =>
+                'str' in item ? item.str + (item.hasEOL ? '\n' : ' ') : '',
+              )
               .join('')
               .slice(0, 20000),
           )
@@ -86,7 +100,13 @@ export default function PdfPreview({ file, onReady }) {
           onReady()
         }
       } catch (failure) {
-        if (!cancelled && failure.name !== 'RenderingCancelledException') {
+        if (
+          !cancelled &&
+          !(
+            failure instanceof Error &&
+            failure.name === 'RenderingCancelledException'
+          )
+        ) {
           setError(
             'This page couldn’t be displayed. Remove this file and try another copy.',
           )

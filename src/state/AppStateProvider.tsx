@@ -1,10 +1,11 @@
+import type { ProviderProps, DocumentInput } from './types'
 import { useCallback, useEffect, useMemo, useReducer } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
-import { auth, authConfigured } from '../features/auth/firebase.js'
-import { appReducer, createInitialState } from './appReducer.js'
-import { AppStateContext } from './AppStateContext.js'
+import { auth, authConfigured } from '../features/auth/firebase'
+import { appReducer, createInitialState } from './appReducer'
+import { AppStateContext } from './AppStateContext'
 
-export default function AppStateProvider({ children }) {
+export default function AppStateProvider({ children }: ProviderProps) {
   const [state, dispatch] = useReducer(
     appReducer,
     authConfigured,
@@ -24,14 +25,14 @@ export default function AppStateProvider({ children }) {
     )
   }, [])
 
-  const selectDocument = useCallback((document) => {
+  const selectDocument = useCallback((document: DocumentInput) => {
     dispatch({ type: 'document/selected', document })
   }, [])
   const clearDocument = useCallback(
     () => dispatch({ type: 'document/cleared' }),
     [],
   )
-  const markDocumentReady = useCallback((selectionId) => {
+  const markDocumentReady = useCallback((selectionId: string) => {
     dispatch({ type: 'document/ready', selectionId })
   }, [])
   const value = useMemo(

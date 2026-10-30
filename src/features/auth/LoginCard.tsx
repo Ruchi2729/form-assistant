@@ -1,11 +1,20 @@
 import { useState } from 'react'
-import useAppState from '../../state/useAppState.js'
-import Button from '../../components/ui/Button.jsx'
-import GoogleMark from '../../components/illustrations/GoogleMark.jsx'
+import useAppState from '../../state/useAppState'
+import Button from '../../components/ui/Button'
+import GoogleMark from '../../components/illustrations/GoogleMark'
 import { signInWithGoogle, signOutAccount } from './firebase'
 
-function signInMessage(error) {
-  const messages = {
+function signInMessage(error: unknown): string {
+  const code =
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof error.code === 'string'
+      ? error.code
+      : error instanceof Error
+        ? error.message
+        : ''
+  const messages: Record<string, string> = {
     'auth/popup-closed-by-user':
       'Sign-in cancelled. Your selected document is still here.',
     'auth/cancelled-popup-request':
@@ -21,10 +30,7 @@ function signInMessage(error) {
     'auth/not-configured':
       'Google sign-in is currently unavailable. Please try again later.',
   }
-  return (
-    messages[error.code || error.message] ||
-    'We couldn’t sign you in. Please try again.'
-  )
+  return messages[code] || 'We couldn’t sign you in. Please try again.'
 }
 
 export default function LoginCard() {

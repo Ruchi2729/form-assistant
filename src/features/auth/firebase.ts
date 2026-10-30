@@ -7,7 +7,10 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth'
-import savedConfig from './firebase-config.json'
+import savedConfigJson from './firebase-config.json'
+import type { FirebaseOptions } from 'firebase/app'
+
+const savedConfig: Partial<FirebaseOptions> = savedConfigJson
 
 // Firebase web configuration is public. Never put OAuth secrets here.
 const config = {
@@ -26,11 +29,11 @@ export const auth = authConfigured
     })
   : null
 
-export function signInWithGoogle() {
+export async function signInWithGoogle(): Promise<void> {
   if (!auth) return Promise.reject(new Error('auth/not-configured'))
   const provider = new GoogleAuthProvider()
   provider.setCustomParameters({ prompt: 'select_account' })
-  return signInWithPopup(auth, provider)
+  await signInWithPopup(auth, provider)
 }
 
 export function signOutAccount() {

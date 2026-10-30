@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test'
-import { png, samplePdf } from './fixtures.js'
+import { png, samplePdf } from './fixtures'
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/')
@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
 test('previews a photo before sign-in without transmitting its contents', async ({
   page,
 }) => {
-  const outboundWrites = []
+  const outboundWrites: string[] = []
   page.on('request', (request) => {
     if (['POST', 'PUT', 'PATCH'].includes(request.method()))
       outboundWrites.push(request.url())
@@ -20,7 +20,12 @@ test('previews a photo before sign-in without transmitting its contents', async 
   await expect(image).toBeVisible()
   await expect
     .poll(() =>
-      image.evaluate((element) => element.complete && element.naturalWidth > 0),
+      image.evaluate(
+        (element) =>
+          element instanceof HTMLImageElement &&
+          element.complete &&
+          element.naturalWidth > 0,
+      ),
     )
     .toBe(true)
   expect(outboundWrites).toEqual([])
@@ -42,9 +47,15 @@ test('renders a real two-page PDF and exposes its text accessibly', async ({
   await expect
     .poll(() =>
       canvas.evaluate((element) => {
-        const data = element
-          .getContext('2d')
-          .getImageData(0, 0, element.width, element.height).data
+        if (!(element instanceof HTMLCanvasElement)) return false
+        const context = element.getContext('2d')
+        if (!context) return false
+        const data = context.getImageData(
+          0,
+          0,
+          element.width,
+          element.height,
+        ).data
         return data.some(
           (value, index) =>
             index % 4 === 0 && value < 200 && data[index + 3] > 0,

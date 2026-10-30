@@ -1,4 +1,4 @@
-import DocumentIllustration from '../../components/illustrations/DocumentIllustration.jsx'
+import DocumentIllustration from '../../components/illustrations/DocumentIllustration'
 
 export default function ProductStory() {
   return (

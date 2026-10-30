@@ -1,18 +1,17 @@
+import type { DocumentKind } from '../src/state/types'
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   validateFile,
   MAX_FILE_BYTES,
-} from '../src/features/documents/validateFile.js'
+} from '../src/features/documents/validateFile'
 
-function file(name, type, bytes) {
-  const blob = new Blob([bytes], { type })
-  Object.defineProperty(blob, 'name', { value: name })
-  return blob
+function file(name: string, type: string, bytes: BlobPart): File {
+  return new File([bytes], name, { type })
 }
 
 test('recognizes PDFs and supported image signatures', async () => {
-  const examples = [
+  const examples: [File, DocumentKind][] = [
     [file('form.pdf', 'application/pdf', '%PDF-1.7\n'), 'pdf'],
     [
       file(
@@ -44,7 +43,9 @@ test('rejects empty files', async () => {
   )
 })
 test('rejects files over the size limit before reading their contents', async () => {
-  await assert.rejects(validateFile({ size: MAX_FILE_BYTES + 1 }), /too large/)
+  const oversized = file('big.pdf', 'application/pdf', '%PDF-1.7')
+  Object.defineProperty(oversized, 'size', { value: MAX_FILE_BYTES + 1 })
+  await assert.rejects(validateFile(oversized), /too large/)
 })
 test('rejects HTML disguised as a PDF', async () => {
   await assert.rejects(

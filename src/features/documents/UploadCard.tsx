@@ -1,16 +1,16 @@
+import type { ChangeEvent } from 'react'
 import { useEffect, useRef, useState } from 'react'
-import useAppState from '../../state/useAppState.js'
-import Button from '../../components/ui/Button.jsx'
-import Disclosure from '../../components/ui/Disclosure.jsx'
-import LoginCard from '../auth/LoginCard.jsx'
-import DocumentPreview from './DocumentPreview.jsx'
+import useAppState from '../../state/useAppState'
+import Button from '../../components/ui/Button'
+import Disclosure from '../../components/ui/Disclosure'
+import DocumentPreview from './DocumentPreview'
 import { validateFile } from './validateFile'
 
 export default function UploadCard() {
   const { document, selectDocument, clearDocument } = useAppState()
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
-  const fileInput = useRef(null)
+  const fileInput = useRef<HTMLInputElement | null>(null)
   const requestId = useRef(0)
 
   useEffect(
@@ -28,8 +28,9 @@ export default function UploadCard() {
     if (fileInput.current) fileInput.current.value = ''
   }
 
-  async function selectFile(event) {
-    const files = event.target.files
+  async function selectFile(event: ChangeEvent<HTMLInputElement>) {
+    const input = event.currentTarget
+    const files = input.files
     if (!files?.length) return
     const file = files[0]
     const current = ++requestId.current
@@ -40,10 +41,15 @@ export default function UploadCard() {
       if (current === requestId.current)
         selectDocument({ file, ...result, selectionId: crypto.randomUUID() })
     } catch (failure) {
-      if (current === requestId.current) setError(failure.message)
+      if (current === requestId.current)
+        setError(
+          failure instanceof Error
+            ? failure.message
+            : 'Unable to read this file.',
+        )
     } finally {
       if (current === requestId.current) setChecking(false)
-      event.target.value = ''
+      input.value = ''
     }
   }
 
@@ -109,7 +115,6 @@ export default function UploadCard() {
           </Button>
         </div>
       )}
-      <LoginCard />
       <Disclosure
         title="Your document and your choices"
         className="mt-4 border-b-0 border-t border-[#dbe1d3] pt-2"

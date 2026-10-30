@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { AppStateContext } from './AppStateContext.js'
+import { AppStateContext } from './AppStateContext'
 
 export default function useAppState() {
   const state = useContext(AppStateContext)
