@@ -1,0 +1,80 @@
+name: Form Assistant checks and Cloud Run deployment
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: form-assistant-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: docker build -t form-assistant:check .
+      - name: Check container serves the app
+        shell: bash
+        run: |
+          docker run --detach --name prototype --publish 127.0.0.1:8080:8080 form-assistant:check
+          trap 'docker logs prototype; docker rm --force prototype' EXIT
+          curl --fail --retry 10 --retry-connrefused --retry-delay 1 http://127.0.0.1:8080/healthz
+          curl --fail --silent http://127.0.0.1:8080/ | grep -q 'id="root"'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          retention-days: 7
+  deploy:
+    needs: check
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.FORM_ASSISTANT_DEPLOY_ENABLED == 'true'
+    environment: production
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+      REGION: ${{ vars.GCP_REGION }}
+      REPOSITORY: ${{ vars.GCP_ARTIFACT_REPOSITORY }}
+      RUNTIME_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate deployment configuration
+        env:
+          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          DEPLOY_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          RUNTIME_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+        shell: bash
+        run: |
+          : "${PROJECT_ID:?Set GCP_PROJECT_ID}"
+          : "${REGION:?Set GCP_REGION}"
+          : "${REPOSITORY:?Set GCP_ARTIFACT_REPOSITORY}"
+          : "${WIF_PROVIDER:?Set GCP_WORKLOAD_IDENTITY_PROVIDER}"
+          : "${DEPLOY_ACCOUNT:?Set GCP_DEPLOY_SERVICE_ACCOUNT}"
+          : "${RUNTIME_ACCOUNT:?Set GCP_RUNTIME_SERVICE_ACCOUNT}"
+      - uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+      - uses: google-github-actions/setup-gcloud@v3
+      - name: Build and publish image
+        run: |
+          gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/form-assistant:$GITHUB_SHA"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+      - name: Deploy immutable commit tag
+        run: |
+          IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/form-assistant:$GITHUB_SHA"
+          gcloud run deploy form-assistant --image "$IMAGE" --project "$PROJECT_ID" --region "$REGION" --port 8080 --service-account "$RUNTIME_ACCOUNT" --min-instances 0 --max-instances 3 --memory 256Mi --cpu 1 --quiet

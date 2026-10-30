@@ -1,0 +1,62 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mxfile host="app.diagrams.net">
+  <diagram name="System overview" id="system">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" page="1" pageWidth="1600" pageHeight="1000">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="ui" value="React UI&lt;br&gt;Login / Upload / Guided questions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="local" value="Local document tools&lt;br&gt;PDF preview / Fields / Answers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="auth" value="Firebase Authentication&lt;br&gt;Google sign-in" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="40" width="240" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="Cloud Run API&lt;br&gt;Verify identity / Ownership / Consent" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="370" y="200" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="agent" value="Bounded agent runner&lt;br&gt;Next question / Tool proposals" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="720" y="200" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="tools" value="Deterministic tools&lt;br&gt;Validate / Apply approved actions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="720" y="390" width="240" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="llm" value="Vertex AI / Gemini&lt;br&gt;Approved minimal context only" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="200" width="250" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="Firestore&lt;br&gt;Minimal account / Session metadata" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="370" y="540" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="storage" value="Optional temporary storage / OCR&lt;br&gt;Explicit consent / Deletion policy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#666666;fontSize=14;" vertex="1" parent="1">
+          <mxGeometry x="1060" y="390" width="260" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0" value="Sign in" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="ui" target="auth">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" value="On device" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="ui" target="local">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="HTTPS / Token / Approved context" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="ui" target="api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="Validated request" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="api" target="agent">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" value="Model call" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="agent" target="llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" value="Validate tool proposal" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="agent" target="tools">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" value="Metadata" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="api" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" value="Optional processing" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=block;startArrow=block;fontSize=11;" edge="1" parent="1" source="tools" target="storage">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

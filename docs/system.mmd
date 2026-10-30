@@ -1,0 +1,20 @@
+flowchart LR
+  subgraph Device[User device]
+    UI[React UI: login, upload, guided questions]
+    LOCAL[Local PDF tools and document state]
+    UI <--> LOCAL
+  end
+  AUTH[Firebase Authentication: Google sign-in]
+  subgraph Backend[Cloud Run: one modular backend]
+    API[API: verify token, ownership, consent]
+    AGENT[Bounded agent runner]
+    TOOLS[Allowlisted tools and validation]
+    API --> AGENT
+    AGENT <--> TOOLS
+  end
+  UI <--> AUTH
+  UI <-->|HTTPS: token and approved context| API
+  AGENT <-->|Minimal approved context| LLM[Gemini through Vertex AI]
+  API <--> DB[Firestore: account and workflow metadata]
+  TOOLS -. Optional consented processing .-> FILES[Private temporary storage and OCR]
+  AGENT -->|Validated question or proposal| API
