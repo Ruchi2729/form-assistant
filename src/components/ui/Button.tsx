@@ -1,4 +1,11 @@
-export default function Button({ children, className = '', type = 'button', ...props }) {
+import type { ComponentPropsWithoutRef } from 'react'
+
+export default function Button({
+  children,
+  className = '',
+  type = 'button',
+  ...props
+}: ComponentPropsWithoutRef<'button'>) {
   return (
     <button
       type={type}

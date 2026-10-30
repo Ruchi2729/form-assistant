@@ -6,3 +6,5 @@ dist/
 *.log
 .DS_Store
 gha-creds-*.json
+test-results/
+playwright-report/

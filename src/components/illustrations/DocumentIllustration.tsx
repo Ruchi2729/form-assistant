@@ -32,7 +32,8 @@ export default function DocumentIllustration() {
         </div>
       </div>
       <div className="floating-note">
-        <span>✓</span> At your own pace.</div>
+        <span>✓</span> At your own pace.
+      </div>
       <span className="spark spark-one">✳</span>
       <span className="spark spark-two">+</span>
     </div>
