@@ -47,7 +47,7 @@ The current workflow uses checked-in nonsecret values instead of these variables
 
 ## 4. Deploy and verify
 
-Run the workflow from Actions on main. CI must pass before the deploy job starts. After the first successful deployment, an administrator grants public access to this static frontend if permitted by organization policy. Check the service URL, /healthz, root HTML, CSS/JS asset requests, mobile layout and keyboard interactions. A successful build alone is not a verified deployment.
+Run the workflow from Actions on main. CI must pass before the deploy job starts. After the first successful deployment, an administrator grants public access to this static frontend if permitted by organization policy. Check the service URL, /health, root HTML, CSS/JS asset requests, mobile layout and keyboard interactions. A successful build alone is not a verified deployment.
 
 The initial maximum of three instances reduces potential scaling but is not a hard cost cap. Artifact storage and other services can incur costs independently.
 

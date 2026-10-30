@@ -32,9 +32,9 @@ Before enabling deployment:
 5. Set GitHub variables: GCP_PROJECT_ID, GCP_REGION (for example us-central1), GCP_ARTIFACT_REPOSITORY, GCP_WORKLOAD_IDENTITY_PROVIDER (full provider resource path), GCP_DEPLOY_SERVICE_ACCOUNT (email).
 6. Create the GitHub `production` environment; configure branch restrictions and any review policy you want.
 7. Set FORM_ASSISTANT_DEPLOY_ENABLED=true only when ready. Public website access is a separate explicit Cloud Run IAM setup step: the deploy workflow does not change access policy. The initial service may require an administrator to provision it and its runtime identity first.
-8. Set billing alerts and monitoring, verify the deployed URL and /healthz, and rehearse rollback to a prior Cloud Run revision. Maximum instances is initially 3 for this preview; tune using measured demand and quotas. It is not a guarantee of a hard spending limit.
+8. Set billing alerts and monitoring, verify the deployed URL and /health, and rehearse rollback to a prior Cloud Run revision. Maximum instances is initially 3 for this preview; tune using measured demand and quotas. It is not a guarantee of a hard spending limit.
 
-No cloud resources have been created and no deployment has been performed. This workflow becomes active when this standalone repository is pushed to GitHub.
+The prototype is deployed to Cloud Run in `form-assistant-better-life`, region `us-central1`. See [live deployment](docs/LIVE_DEPLOYMENT.md). This workflow becomes active when this standalone repository is pushed to GitHub.
 
 ## Next milestone: real authentication
 
