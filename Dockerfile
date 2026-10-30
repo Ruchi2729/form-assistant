@@ -3,6 +3,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+ARG APP_COMMIT=local
+ENV APP_COMMIT=$APP_COMMIT
 RUN npm run build
 
 FROM nginxinc/nginx-unprivileged:alpine

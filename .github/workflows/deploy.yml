@@ -44,6 +44,7 @@ jobs:
           curl --fail --retry 10 --retry-all-errors --retry-delay 1 --max-time 5 --retry-max-time 30 http://127.0.0.1:8080/health
           curl --fail --silent --output /tmp/prototype-index.html http://127.0.0.1:8080/
           grep -q 'id="root"' /tmp/prototype-index.html
+          PLAYWRIGHT_BASE_URL=http://127.0.0.1:8080 npm run test:e2e
       - uses: actions/upload-artifact@v4
         with:
           name: frontend-dist
@@ -84,7 +85,7 @@ jobs:
         run: |
           gcloud auth configure-docker "$REGION-docker.pkg.dev" --quiet
           IMAGE="$REGION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/form-assistant:$GITHUB_SHA"
-          docker build -t "$IMAGE" .
+          docker build --build-arg APP_COMMIT="$GITHUB_SHA" -t "$IMAGE" .
           docker push "$IMAGE"
       - name: Deploy immutable commit tag
         run: |

@@ -16,3 +16,9 @@ The current prototype is the frontend only. Google sign-in, document upload, age
 To inspect revisions and roll back, use the Cloud Run console: https://console.cloud.google.com/run/detail/us-central1/form-assistant/revisions?project=form-assistant-better-life
 
 Future pushes to main deploy automatically after checks pass. Development should use branches and pull requests. No browser-based accessibility or visual audit has been completed for this deployment.
+
+## Developer dashboard
+
+Open /developer for deployed version, commit, build timestamp, HTTP health and recent main-branch pipeline runs. /version.json is emitted during the build; Docker receives the actual commit via APP_COMMIT. Pipeline status is fetched from GitHub's public API with explicit refresh and no browser token. Metadata is public; the dashboard does not provide privileged cloud controls or user data. Cloud Run, logs and billing links require Google authorization.
+
+The container smoke step now runs browser tests against Nginx itself, including PDF workers served as JavaScript .mjs modules. This catches MIME-type issues that the Vite preview server can mask.

@@ -1,3 +1,4 @@
+import DeveloperDashboard from './features/developer/DeveloperDashboard'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import ProductStory from './features/landing/ProductStory'
@@ -10,6 +11,7 @@ import PurposeSection from './features/landing/PurposeSection'
 
 export default function App() {
   const state = useAppState()
+  if (window.location.pathname === '/developer') return <DeveloperDashboard />
   return (
     <>
       <a className="skip-link" href="#main">
