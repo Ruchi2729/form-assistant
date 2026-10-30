@@ -38,24 +38,22 @@ jobs:
           retention-days: 7
   deploy:
     needs: check
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request' && vars.FORM_ASSISTANT_DEPLOY_ENABLED == 'true'
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     env:
-      PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
-      REGION: ${{ vars.GCP_REGION }}
-      REPOSITORY: ${{ vars.GCP_ARTIFACT_REPOSITORY }}
-      RUNTIME_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
+      PROJECT_ID: form-assistant-better-life
+      REGION: us-central1
+      REPOSITORY: form-assistant
+      RUNTIME_ACCOUNT: frontend-runtime@form-assistant-better-life.iam.gserviceaccount.com
+      WIF_PROVIDER: projects/313979383533/locations/global/workloadIdentityPools/github-actions/providers/github
+      DEPLOY_ACCOUNT: github-deploy@form-assistant-better-life.iam.gserviceaccount.com
     steps:
       - uses: actions/checkout@v4
       - name: Validate deployment configuration
-        env:
-          WIF_PROVIDER: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          DEPLOY_ACCOUNT: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
-          RUNTIME_ACCOUNT: ${{ vars.GCP_RUNTIME_SERVICE_ACCOUNT }}
         shell: bash
         run: |
           : "${PROJECT_ID:?Set GCP_PROJECT_ID}"
@@ -66,8 +64,8 @@ jobs:
           : "${RUNTIME_ACCOUNT:?Set GCP_RUNTIME_SERVICE_ACCOUNT}"
       - uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
-          service_account: ${{ vars.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.DEPLOY_ACCOUNT }}
       - uses: google-github-actions/setup-gcloud@v3
       - name: Build and publish image
         run: |
