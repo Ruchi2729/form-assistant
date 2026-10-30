@@ -5,3 +5,6 @@ dist
 gha-creds-*.json
 docs/
 scripts/
+test-results/
+playwright-report/
+tests/
